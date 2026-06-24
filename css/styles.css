@@ -1,0 +1,22 @@
+body { background: #f8f9fa; }
+
+.table-wrap {
+  max-height: 520px;
+  overflow: auto;
+  border: 1px solid #dee2e6;
+  border-radius: .5rem;
+  background: #fff;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f1f3f5 !important;
+  white-space: nowrap;
+}
+
+td, th { vertical-align: top; }
+
+.small-muted { font-size: .875rem; color: #6c757d; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
