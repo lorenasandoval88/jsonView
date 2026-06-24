@@ -44,7 +44,7 @@ export function computeStats(dataRows, cols) {
 
   let missingCount = 0;
   const colData = Object.fromEntries(
-    cols.map((c) => [c, { unique: new Set(), missing: 0, samples: [] }])
+    cols.map((c) => [c, { counts: new Map(), missing: 0, samples: [] }])
   );
   const SAMPLE_LIMIT = 5;
 
@@ -63,24 +63,42 @@ export function computeStats(dataRows, cols) {
 
       const key = typeof value === "object" ? JSON.stringify(value) : String(value);
       const bucket = colData[col];
-      if (!bucket.unique.has(key)) {
-        bucket.unique.add(key);
-        if (bucket.samples.length < SAMPLE_LIMIT) bucket.samples.push(key);
+      const prev = bucket.counts.get(key) || 0;
+      bucket.counts.set(key, prev + 1);
+      if (prev === 0 && bucket.samples.length < SAMPLE_LIMIT) {
+        bucket.samples.push(key);
       }
     }
   }
 
   const uniqueSummary = cols.map((col) => ({
     column: col,
-    uniqueCount: colData[col].unique.size,
+    uniqueCount: colData[col].counts.size,
     missing: colData[col].missing,
     samples: colData[col].samples,
   }));
 
-  const idCol = findColumn(cols, /(^|[._])id$|^id$|uuid|guid/i);
-  const fileCol =
-    findColumn(cols, /filename|file_?name/i) ||
-    findColumn(cols, /(^|[._])file$/i);
+  const TOP_REPEATS = 5;
+  const duplicatesSummary = [];
+  for (const col of cols) {
+    const repeats = [];
+    let duplicateRows = 0;
+    for (const [value, count] of colData[col].counts) {
+      if (count > 1) {
+        repeats.push({ value, count });
+        duplicateRows += count - 1;
+      }
+    }
+    if (!repeats.length) continue;
+    repeats.sort((a, b) => b.count - a.count || (a.value < b.value ? -1 : 1));
+    duplicatesSummary.push({
+      column: col,
+      duplicateValueCount: repeats.length,
+      duplicateRowCount: duplicateRows,
+      topRepeats: repeats.slice(0, TOP_REPEATS),
+    });
+  }
+  duplicatesSummary.sort((a, b) => b.duplicateRowCount - a.duplicateRowCount);
 
   return {
     rowCount,
@@ -88,20 +106,8 @@ export function computeStats(dataRows, cols) {
     missingCount,
     missingPct: totalCells ? (missingCount / totalCells) * 100 : 0,
     uniqueSummary,
-    highlights: {
-      id: makeHighlight(idCol, colData),
-      file: makeHighlight(fileCol, colData),
-    },
+    duplicatesSummary,
   };
-}
-
-function findColumn(cols, pattern) {
-  return cols.find((c) => pattern.test(c)) || null;
-}
-
-function makeHighlight(col, colData) {
-  if (!col) return { column: null, uniqueCount: 0 };
-  return { column: col, uniqueCount: colData[col].unique.size };
 }
 
 export function formatNumber(num) {

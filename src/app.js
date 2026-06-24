@@ -11,13 +11,11 @@ const refs = {
   statRows: document.getElementById("statRows"),
   statCols: document.getElementById("statCols"),
 
-  statUniqueIds: document.getElementById("statUniqueIds"),
-  statUniqueFiles: document.getElementById("statUniqueFiles"),
-  statIdCol: document.getElementById("statIdCol"),
-  statFileCol: document.getElementById("statFileCol"),
-
   uniqueTableBody: document.querySelector("#uniqueTable tbody"),
   uniqueEmpty: document.getElementById("uniqueEmpty"),
+
+  duplicatesTableBody: document.querySelector("#duplicatesTable tbody"),
+  duplicatesEmpty: document.getElementById("duplicatesEmpty"),
 
   dataTableHead: document.querySelector("#dataTable thead"),
   dataTableBody: document.querySelector("#dataTable tbody"),

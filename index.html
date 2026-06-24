@@ -39,22 +39,6 @@
         <div class="col-6 col-md-3">
           <div class="card shadow-sm"><div class="card-body"><div class="text-secondary small">Columns</div><div id="statCols" class="h4 mb-0">0</div></div></div>
         </div>
-        <div class="col-6 col-md-3">
-          <div class="card shadow-sm border-primary-subtle">
-            <div class="card-body">
-              <div class="text-secondary small">Unique IDs <span id="statIdCol" class="mono text-secondary"></span></div>
-              <div id="statUniqueIds" class="h4 mb-0">0</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card shadow-sm border-primary-subtle">
-            <div class="card-body">
-              <div class="text-secondary small">Unique Filenames <span id="statFileCol" class="mono text-secondary"></span></div>
-              <div id="statUniqueFiles" class="h4 mb-0">0</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="card shadow-sm mb-3">
@@ -67,6 +51,19 @@
             </table>
           </div>
           <div id="uniqueEmpty" class="text-secondary small d-none">No columns detected.</div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Duplicates Summary</h2>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle mb-0" id="duplicatesTable">
+              <thead><tr><th>Column</th><th>Repeated Values</th><th>Duplicate Rows</th><th>Top Repeats</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="duplicatesEmpty" class="text-secondary small d-none">No duplicate values detected.</div>
         </div>
       </div>
 

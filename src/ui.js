@@ -17,10 +17,8 @@ export function resetUI(refs) {
   refs.dataTableBody.innerHTML = "";
   refs.uniqueTableBody.innerHTML = "";
   refs.uniqueEmpty.classList.add("d-none");
-  refs.statUniqueIds.textContent = "0";
-  refs.statUniqueFiles.textContent = "0";
-  refs.statIdCol.textContent = "";
-  refs.statFileCol.textContent = "";
+  refs.duplicatesTableBody.innerHTML = "";
+  refs.duplicatesEmpty.classList.add("d-none");
   clearError(refs.errorBox);
 }
 
@@ -28,17 +26,19 @@ export function renderStats(refs, stats) {
   refs.statRows.textContent = stats.rowCount.toLocaleString();
   refs.statCols.textContent = stats.colCount.toLocaleString();
 
-  renderHighlight(refs.statUniqueIds, refs.statIdCol, stats.highlights.id);
-  renderHighlight(refs.statUniqueFiles, refs.statFileCol, stats.highlights.file);
+  renderUniqueTable(refs, stats.uniqueSummary);
+  renderDuplicatesTable(refs, stats.duplicatesSummary);
+}
 
+function renderUniqueTable(refs, uniqueSummary) {
   refs.uniqueTableBody.innerHTML = "";
-  if (!stats.uniqueSummary.length) {
+  if (!uniqueSummary.length) {
     refs.uniqueEmpty.classList.remove("d-none");
     return;
   }
 
   refs.uniqueEmpty.classList.add("d-none");
-  for (const u of stats.uniqueSummary) {
+  for (const u of uniqueSummary) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td class="mono">${escapeHtml(u.column)}</td>
@@ -50,14 +50,34 @@ export function renderStats(refs, stats) {
   }
 }
 
-function renderHighlight(countEl, colEl, highlight) {
-  if (!highlight.column) {
-    countEl.textContent = "—";
-    colEl.textContent = "(not detected)";
+function renderDuplicatesTable(refs, duplicatesSummary) {
+  refs.duplicatesTableBody.innerHTML = "";
+  if (!duplicatesSummary.length) {
+    refs.duplicatesEmpty.classList.remove("d-none");
     return;
   }
-  countEl.textContent = highlight.uniqueCount.toLocaleString();
-  colEl.textContent = `(${highlight.column})`;
+
+  refs.duplicatesEmpty.classList.add("d-none");
+  for (const d of duplicatesSummary) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="mono">${escapeHtml(d.column)}</td>
+      <td>${formatNumber(d.duplicateValueCount)}</td>
+      <td>${formatNumber(d.duplicateRowCount)}</td>
+      <td class="small text-secondary">${formatRepeats(d.topRepeats)}</td>
+    `;
+    refs.duplicatesTableBody.appendChild(tr);
+  }
+}
+
+function formatRepeats(repeats) {
+  const MAX_LEN = 30;
+  return repeats
+    .map(({ value, count }) => {
+      const trimmed = value.length > MAX_LEN ? value.slice(0, MAX_LEN) + "\u2026" : value;
+      return `${escapeHtml(trimmed)} \u00d7${count}`;
+    })
+    .join(", ");
 }
 
 function formatSamples(samples) {
