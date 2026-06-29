@@ -1,3 +1,3 @@
 # jsonView
 
-A web app to conver JSOn into readable tables
+A web app to conver JSON files into readable tables
